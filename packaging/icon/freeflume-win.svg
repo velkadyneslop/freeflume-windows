@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FreeFlume — Windows 11 "Float" app icon. Source of truth for rendering is tools/icongen.cs
+     (SkiaSharp); this SVG mirrors that design. A matte blue tile inset to float on a soft
+     elevation shadow, faint top edge-light, white play + flume waves. -->
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3fa1ea"/>
+      <stop offset="1" stop-color="#1f62ae"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0.62" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a2c4e" stop-opacity="0"/>
+      <stop offset="1" stop-color="#0a2c4e" stop-opacity="0.16"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="0.30">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="elev" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="17" flood-color="#0e2a47" flood-opacity="0.30"/>
+    </filter>
+    <filter id="cast" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="7" stdDeviation="8" flood-color="#0a2c4e" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <!-- Floating matte tile (52px inset, soft elevation shadow) -->
+  <rect x="52" y="52" width="408" height="408" rx="96" fill="url(#bg)" filter="url(#elev)"/>
+  <rect x="52" y="52" width="408" height="408" rx="96" fill="url(#floor)"/>
+  <rect x="52" y="52" width="408" height="408" rx="96" fill="url(#sheen)"/>
+  <rect x="53" y="53" width="406" height="406" rx="95"
+        fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="2"/>
+
+  <!-- Play + flume mark, scaled 0.85 to sit inside the floated tile -->
+  <g transform="translate(256 256) scale(0.85) translate(-256 -256)">
+    <g fill="none" stroke="#ffffff" stroke-linecap="round">
+      <path d="M 154 372 C 192 351 226 351 256 367 C 286 383 320 383 358 361"
+            stroke-width="19" opacity="0.90"/>
+      <path d="M 170 409 C 203 392 232 392 256 404 C 280 416 309 416 342 399"
+            stroke-width="13" opacity="0.42"/>
+    </g>
+    <path d="M 204 156 L 204 312 L 338 234 Z" fill="#ffffff"
+          stroke="#ffffff" stroke-width="28" stroke-linejoin="round" filter="url(#cast)"/>
+  </g>
+</svg>

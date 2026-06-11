@@ -1,0 +1,31 @@
+# Build output
+bin/
+obj/
+artifacts/
+
+# Local test-build staging (large binaries; distributed out-of-band, not via the repo)
+testflight/
+
+# Personal design docs — kept locally, not published
+FreeFlume-Feature-Spec.*
+FreeFlume-Windows-Additions.*
+
+# Native tools — too large for the repo (GitHub rejects files > 100 MB).
+# ffmpeg.exe (~195 MB) and libmpv-2.dll (~112 MB) ship as Release assets and are placed locally
+# to build (see README "Building from source"); yt-dlp.exe self-updates from its official release.
+/third_party/win-x64/ffmpeg.exe
+/third_party/win-x64/libmpv-2.dll
+/third_party/win-x64/yt-dlp.exe
+
+# IDE / tooling
+.vs/
+*.user
+*.suo
+
+# Local release helpers (commit identity / local asset paths)
+push.ps1
+release.ps1
+publish.ps1
+
+# Claude Code local session + memory
+.claude/

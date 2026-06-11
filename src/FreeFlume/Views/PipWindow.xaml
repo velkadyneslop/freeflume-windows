@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Window
+    x:Class="FreeFlume.Views.PipWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:player="using:FreeFlume.Player">
+    <Grid Background="Black" PointerMoved="OnPointerMoved">
+        <Grid Background="Transparent"
+              PointerPressed="OnDragStart" PointerMoved="OnDragMove"
+              PointerReleased="OnDragEnd" PointerCaptureLost="OnDragEnd">
+            <player:MpvPlayer x:Name="PipPlayer" />
+        </Grid>
+        <Border x:Name="Bar" VerticalAlignment="Bottom" Background="#CC101010" Padding="4,2"
+                Visibility="Collapsed" PointerEntered="OnBarEnter" PointerExited="OnBarExit">
+            <Grid ColumnSpacing="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Click="OnPlayPause" Background="Transparent" BorderThickness="0"
+                        Foreground="White" Padding="8,4" ToolTipService.ToolTip="Play/Pause">
+                    <FontIcon x:Name="PlayIcon" Glyph="&#xE769;" FontSize="14" />
+                </Button>
+                <TextBlock x:Name="TitleText" Grid.Column="1" Foreground="White" VerticalAlignment="Center"
+                           Margin="4,0" TextTrimming="CharacterEllipsis" IsHitTestVisible="False"
+                           Style="{ThemeResource CaptionTextBlockStyle}" />
+                <Button Grid.Column="2" Click="OnReturn" Background="Transparent" BorderThickness="0"
+                        Foreground="White" Padding="8,4" ToolTipService.ToolTip="Return to player">
+                    <FontIcon Glyph="&#xE73F;" FontSize="14" />
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Page
+    x:Class="FreeFlume.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <Style x:Key="Section" TargetType="TextBlock" BasedOn="{StaticResource SubtitleTextBlockStyle}">
+            <Setter Property="Margin" Value="0,16,0,4" />
+        </Style>
+        <Style x:Key="Row" TargetType="Grid">
+            <Setter Property="Padding" Value="0,8" />
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer Padding="20,16,20,24">
+        <StackPanel MaxWidth="640" HorizontalAlignment="Left" Spacing="2">
+            <TextBlock Text="Settings" Style="{ThemeResource TitleTextBlockStyle}" />
+
+            <!-- Appearance -->
+            <TextBlock Text="Appearance" Style="{StaticResource Section}" />
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Color scheme" VerticalAlignment="Center" />
+                <ComboBox x:Name="SchemeCombo" Grid.Column="1" MinWidth="180" SelectionChanged="OnSchemeChanged">
+                    <ComboBoxItem Content="Follow system" Tag="system" />
+                    <ComboBoxItem Content="Light" Tag="light" />
+                    <ComboBoxItem Content="Dark" Tag="dark" />
+                </ComboBox>
+            </Grid>
+
+            <!-- Playback -->
+            <TextBlock Text="Playback" Style="{StaticResource Section}" />
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Default quality" VerticalAlignment="Center" />
+                <ComboBox x:Name="QualityCombo" Grid.Column="1" MinWidth="180" SelectionChanged="OnQualityChanged">
+                    <ComboBoxItem Content="Best" />
+                    <ComboBoxItem Content="Auto" />
+                    <ComboBoxItem Content="2160p" />
+                    <ComboBoxItem Content="1440p" />
+                    <ComboBoxItem Content="1080p" />
+                    <ComboBoxItem Content="720p" />
+                    <ComboBoxItem Content="480p" />
+                    <ComboBoxItem Content="360p" />
+                </ComboBox>
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Volume" VerticalAlignment="Center" />
+                <Slider x:Name="VolumeSlider" Grid.Column="1" Width="200" Minimum="0" Maximum="130"
+                        ValueChanged="OnVolumeChanged" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Resume playback" VerticalAlignment="Center" />
+                <ComboBox x:Name="ResumeCombo" Grid.Column="1" MinWidth="180" SelectionChanged="OnResumeChanged">
+                    <ComboBoxItem Content="Resume where I left off" Tag="resume" />
+                    <ComboBoxItem Content="Ask me" Tag="ask" />
+                    <ComboBoxItem Content="Always start fresh" Tag="start" />
+                </ComboBox>
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Hardware decoding" />
+                    <TextBlock Text="Auto (copy-back) is the safe default. Direct3D11 may be lighter on some GPUs; Off forces software decoding."
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Style="{ThemeResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+                <ComboBox x:Name="HwCombo" Grid.Column="1" MinWidth="170" VerticalAlignment="Top"
+                          Margin="24,0,0,0" SelectionChanged="OnHwModeChanged">
+                    <ComboBoxItem Content="Auto (copy-back)" Tag="auto-copy" />
+                    <ComboBoxItem Content="Direct3D11" Tag="d3d11va" />
+                    <ComboBoxItem Content="Off (software)" Tag="no" />
+                </ComboBox>
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Autoplay next" VerticalAlignment="Center" />
+                <ToggleSwitch x:Name="AutoplayToggle" Grid.Column="1" Toggled="OnAutoplayToggled" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Mini player" />
+                    <TextBlock Text="Keep the video playing in a corner when you browse away from it."
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Style="{ThemeResource CaptionTextBlockStyle}" />
+                </StackPanel>
+                <ToggleSwitch x:Name="MiniPlayerToggle" Grid.Column="1" Toggled="OnMiniPlayerToggled"
+                              VerticalAlignment="Top" Margin="24,0,0,0" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Remember picture-in-picture size" />
+                    <TextBlock Text="Reopen the picture-in-picture window at the size you last left it."
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Style="{ThemeResource CaptionTextBlockStyle}" />
+                </StackPanel>
+                <ToggleSwitch x:Name="RememberPipSizeToggle" Grid.Column="1" Toggled="OnRememberPipSizeToggled"
+                              VerticalAlignment="Top" Margin="24,0,0,0" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Sharpen video on high-DPI displays" />
+                    <TextBlock Text="Renders at full display resolution (uses a bit more CPU/GPU)."
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Style="{ThemeResource CaptionTextBlockStyle}" />
+                </StackPanel>
+                <ToggleSwitch x:Name="SharpnessToggle" Grid.Column="1" Toggled="OnSharpnessToggled"
+                              VerticalAlignment="Top" Margin="24,0,0,0" />
+            </Grid>
+
+            <!-- SponsorBlock -->
+            <TextBlock Text="SponsorBlock" Style="{StaticResource Section}" />
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Skip sponsored segments" VerticalAlignment="Center" />
+                <ToggleSwitch x:Name="SponsorToggle" Grid.Column="1" Toggled="OnSponsorToggled" />
+            </Grid>
+            <StackPanel x:Name="SponsorCategories" Spacing="2" Margin="0,4,0,8" />
+
+            <!-- Search -->
+            <TextBlock Text="Search" Style="{StaticResource Section}" />
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Results per page" VerticalAlignment="Center" />
+                <NumberBox x:Name="SearchLimitBox" Grid.Column="1" Width="120" Minimum="5" Maximum="100"
+                           SpinButtonPlacementMode="Inline" ValueChanged="OnSearchLimitChanged" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Show channels in results" VerticalAlignment="Center" />
+                <ToggleSwitch x:Name="IncludeChannelsToggle" Grid.Column="1" Toggled="OnIncludeChannelsToggled" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Show playlists in results" VerticalAlignment="Center" />
+                <ToggleSwitch x:Name="IncludePlaylistsToggle" Grid.Column="1" Toggled="OnIncludePlaylistsToggled" />
+            </Grid>
+
+            <!-- Downloads -->
+            <TextBlock Text="Downloads" Style="{StaticResource Section}" />
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Folder" />
+                    <TextBlock x:Name="FolderText" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Style="{ThemeResource CaptionTextBlockStyle}" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <Button x:Name="ChangeFolderButton" Grid.Column="1" Content="Change…" Click="OnChangeFolderClick" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Max video resolution" VerticalAlignment="Center" />
+                <ComboBox x:Name="MaxHeightCombo" Grid.Column="1" MinWidth="180" SelectionChanged="OnMaxHeightChanged">
+                    <ComboBoxItem Content="No limit" Tag="0" />
+                    <ComboBoxItem Content="2160p (4K)" Tag="2160" />
+                    <ComboBoxItem Content="1440p" Tag="1440" />
+                    <ComboBoxItem Content="1080p" Tag="1080" />
+                    <ComboBoxItem Content="720p" Tag="720" />
+                    <ComboBoxItem Content="480p" Tag="480" />
+                    <ComboBoxItem Content="360p" Tag="360" />
+                </ComboBox>
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Embed subtitles" />
+                    <TextBlock Text="Bake the subtitle track (from the Subtitles language) into downloaded videos."
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Style="{ThemeResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+                <ToggleSwitch x:Name="EmbedSubsToggle" Grid.Column="1" Toggled="OnEmbedSubsToggled"
+                              VerticalAlignment="Top" Margin="24,0,0,0" />
+            </Grid>
+
+            <!-- Screenshots -->
+            <TextBlock Text="Screenshots" Style="{StaticResource Section}" />
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Folder" />
+                    <TextBlock x:Name="ShotFolderText" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Style="{ThemeResource CaptionTextBlockStyle}" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <Button x:Name="ChangeShotFolderButton" Grid.Column="1" Content="Change…" Click="OnChangeShotFolderClick" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Format" VerticalAlignment="Center" />
+                <ComboBox x:Name="ShotFormatCombo" Grid.Column="1" MinWidth="200" SelectionChanged="OnShotFormatChanged">
+                    <ComboBoxItem Content="PNG (Lossless)" Tag="png" />
+                    <ComboBoxItem Content="JPEG" Tag="jpg" />
+                </ComboBox>
+            </Grid>
+
+            <!-- Subtitles -->
+            <TextBlock Text="Subtitles" Style="{StaticResource Section}" />
+            <TextBlock Text="All human-made subtitles are fetched automatically — pick the language from the CC button while watching."
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Style="{ThemeResource CaptionTextBlockStyle}" Margin="0,0,0,4" TextWrapping="Wrap" />
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Font (blank = default)" VerticalAlignment="Center" />
+                <TextBox x:Name="SubFontBox" Grid.Column="1" Width="180" PlaceholderText="e.g. Segoe UI" TextChanged="OnSubFontChanged" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Font size" VerticalAlignment="Center" />
+                <Slider x:Name="SubSizeSlider" Grid.Column="1" Width="200" Minimum="10" Maximum="120"
+                        ValueChanged="OnSubSizeChanged" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Text color" VerticalAlignment="Center" />
+                <ComboBox x:Name="SubColorCombo" Grid.Column="1" MinWidth="180" SelectionChanged="OnSubColorChanged">
+                    <ComboBoxItem Content="White" Tag="#FFFFFF" />
+                    <ComboBoxItem Content="Yellow" Tag="#FFFF00" />
+                    <ComboBoxItem Content="Cyan" Tag="#00FFFF" />
+                    <ComboBoxItem Content="Green" Tag="#00FF00" />
+                    <ComboBoxItem Content="Red" Tag="#FF0000" />
+                    <ComboBoxItem Content="Black" Tag="#000000" />
+                </ComboBox>
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Outline thickness" VerticalAlignment="Center" />
+                <Slider x:Name="SubOutlineSlider" Grid.Column="1" Width="200" Minimum="0" Maximum="6"
+                        ValueChanged="OnSubOutlineChanged" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Shadow" VerticalAlignment="Center" />
+                <Slider x:Name="SubShadowSlider" Grid.Column="1" Width="200" Minimum="0" Maximum="6"
+                        ValueChanged="OnSubShadowChanged" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Bold" VerticalAlignment="Center" />
+                <ToggleSwitch x:Name="SubBoldToggle" Grid.Column="1" Toggled="OnSubBoldToggled" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Background box" VerticalAlignment="Center" />
+                <ToggleSwitch x:Name="SubBackgroundToggle" Grid.Column="1" Toggled="OnSubBackgroundToggled" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Shadow color" VerticalAlignment="Center" />
+                <ComboBox x:Name="SubShadowColorCombo" Grid.Column="1" MinWidth="180" SelectionChanged="OnSubShadowColorChanged">
+                    <ComboBoxItem Content="Black" Tag="#FF000000" />
+                    <ComboBoxItem Content="Dark gray" Tag="#FF404040" />
+                    <ComboBoxItem Content="None" Tag="#00000000" />
+                </ComboBox>
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Auto-generated captions" />
+                    <TextBlock Text="Also fetch YouTube's automatic captions (not just human-made ones)."
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Style="{ThemeResource CaptionTextBlockStyle}" />
+                </StackPanel>
+                <ToggleSwitch x:Name="SubAutoToggle" Grid.Column="1" Toggled="OnSubAutoToggled"
+                              VerticalAlignment="Top" Margin="24,0,0,0" />
+            </Grid>
+
+            <!-- Keyboard shortcuts -->
+            <TextBlock Text="Keyboard shortcuts" Style="{StaticResource Section}" />
+            <TextBlock Text="Player shortcuts. Click a key to rebind it."
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Style="{ThemeResource CaptionTextBlockStyle}" Margin="0,0,0,4" />
+            <StackPanel x:Name="ShortcutRows" Spacing="2" Margin="0,4,0,8" />
+            <Button x:Name="ResetShortcutsButton" Content="Reset to defaults" Click="OnResetShortcuts" />
+
+            <!-- Privacy -->
+            <TextBlock Text="Privacy" Style="{StaticResource Section}" />
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Remember watch history" VerticalAlignment="Center" />
+                <ToggleSwitch x:Name="HistoryToggle" Grid.Column="1" Toggled="OnHistoryToggled" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Remember search history" VerticalAlignment="Center" />
+                <ToggleSwitch x:Name="SearchHistoryToggle" Grid.Column="1" Toggled="OnSearchHistoryToggled" />
+            </Grid>
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                <Button x:Name="ClearHistoryButton" Content="Clear watch history" Click="OnClearHistoryClick" />
+                <Button x:Name="ClearSearchButton" Content="Clear search history" Click="OnClearSearchClick" />
+            </StackPanel>
+
+            <!-- Backends -->
+            <TextBlock Text="Backends" Style="{StaticResource Section}" />
+            <TextBlock x:Name="BackendText" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Style="{ThemeResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Auto-update yt-dlp" />
+                    <TextBlock Text="Check for a newer yt-dlp once a day (keeps playback working as YouTube changes). mpv is not auto-updated."
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Style="{ThemeResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+                <ToggleSwitch x:Name="AutoUpdateToggle" Grid.Column="1" Toggled="OnAutoUpdateToggled"
+                              VerticalAlignment="Top" Margin="24,0,0,0" />
+            </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="UpdateStatusText" VerticalAlignment="Center" TextWrapping="Wrap"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Style="{ThemeResource CaptionTextBlockStyle}" />
+                <Button x:Name="UpdateYtDlpButton" Grid.Column="1" Content="Update yt-dlp now"
+                        Click="OnUpdateYtDlpClick" />
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

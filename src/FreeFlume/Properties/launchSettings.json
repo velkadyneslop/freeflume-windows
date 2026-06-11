@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "FreeFlume (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "FreeFlume (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

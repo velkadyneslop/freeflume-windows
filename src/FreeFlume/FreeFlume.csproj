@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+        <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+        <OutputType>WinExe</OutputType>
+        <ApplicationIcon>Assets\FreeFlume.ico</ApplicationIcon>
+
+        <!-- WinUI 3 -->
+        <UseWinUI>true</UseWinUI>
+        <EnableMsixTooling>true</EnableMsixTooling>
+        <WindowsPackageType>None</WindowsPackageType>
+        <!-- LTSC box has no Windows App SDK runtime installed: bundle it so the
+             unpackaged app is fully standalone. -->
+        <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+
+        <!-- Project Options -->
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>FreeFlume</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+        <!-- App version (bump on each release; shown in the title bar + Settings → Backends) -->
+        <Version>1.0.0</Version>
+
+        <!-- App Options -->
+        <UseRidGraph>true</UseRidGraph>
+        <Platforms>x86;x64;ARM64</Platforms>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <PublishProfile>win-$(Platform).pubxml</PublishProfile>
+        <RuntimeIdentifiers Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)')) >= 8">win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+        <RuntimeIdentifiers Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)')) &lt; 8">win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="Assets\SplashScreen.scale-200.png" />
+        <Content Include="Assets\LockScreenLogo.scale-200.png" />
+        <Content Include="Assets\Square150x150Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+        <Content Include="Assets\StoreLogo.png" />
+        <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+        <Content Include="Assets\FreeFlume.ico" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="FreeFlume.slnx" />
+    </ItemGroup>
+
+    <!-- Bundled native runtime deps: copied next to the unpackaged app's exe.
+         The big three (mpv/yt-dlp/ffmpeg) are skipped when LeanBundle=true — the downloader installer
+         fetches them at install time, keeping that build's download tiny. The portable all-in-one build
+         (default) bundles everything. -->
+    <ItemGroup>
+        <None Include="..\..\third_party\win-x64\yt-dlp.conf" Link="yt-dlp.conf" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(LeanBundle)' != 'true'">
+        <None Include="..\..\third_party\win-x64\libmpv-2.dll" Link="libmpv-2.dll" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="..\..\third_party\win-x64\yt-dlp.exe" Link="yt-dlp.exe" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="..\..\third_party\win-x64\ffmpeg.exe" Link="ffmpeg.exe" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.*" />
+        <PackageReference Include="Microsoft.Web.WebView2" Version="1.*" />
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.*" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
+
+        <!-- D3D11/DXGI bindings for the SwapChainPanel-hosted mpv video surface -->
+        <PackageReference Include="Vortice.Direct3D11" Version="3.*" />
+
+        <!-- Local persistence (history, subscriptions, playlists) -->
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.*" />
+
+        <Manifest Include="$(ApplicationManifest)" />
+    </ItemGroup>
+
+    <!-- 
+        Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
+        Tools extension to be activated for this project even if the Windows App SDK Nuget
+        package has not yet been restored.
+    -->
+    <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+        <ProjectCapability Include="Msix"/>
+    </ItemGroup>
+
+    <!-- 
+        Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution 
+        Explorer "Package and Publish" context menu entry to be enabled for this project even if 
+        the Windows App SDK Nuget package has not yet been restored.
+    -->
+    <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+        <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+    </PropertyGroup>
+</Project>
