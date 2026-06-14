@@ -59,6 +59,7 @@ public sealed class Settings
     public int SearchLimit { get; set; } = 20;               // results per page (5..100)
     public bool SearchIncludeChannels { get; set; } = true;  // show channel results inline
     public bool SearchIncludePlaylists { get; set; } = true; // show playlist results inline
+    public bool EnableSearchSuggestions { get; set; } = false; // off: sends typed text to Google
 
     // Downloads
     public string DownloadFolder { get; set; } = "";         // empty => default

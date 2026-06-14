@@ -9,7 +9,7 @@
 ;     tagged "v{version}":  ffmpeg.exe, libmpv-2.dll  (yt-dlp + .NET come from official sources).
 
 #define MyAppName "FreeFlume"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.3"
 #define MyAppPublisher "velkadyne"
 #define MyAppExeName "FreeFlume.exe"
 #define MyRepoUrl "https://github.com/velkadyneslop/freeflume-windows"
@@ -59,6 +59,7 @@ Source: "..\artifacts\FreeFlume-lean\*"; DestDir: "{app}"; Flags: recursesubdirs
 Source: "{tmp}\yt-dlp.exe";    DestDir: "{app}"; Flags: external ignoreversion
 Source: "{tmp}\ffmpeg.exe";    DestDir: "{app}"; Flags: external ignoreversion
 Source: "{tmp}\libmpv-2.dll";  DestDir: "{app}"; Flags: external ignoreversion
+Source: "{tmp}\deno.exe";      DestDir: "{app}"; Flags: external ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -131,6 +132,8 @@ begin
   DownloadPage.Add('{#YtDlpUrl}', 'yt-dlp.exe', '');
   DownloadPage.Add('{#ToolsBaseUrl}/ffmpeg.exe', 'ffmpeg.exe', '');
   DownloadPage.Add('{#ToolsBaseUrl}/libmpv-2.dll', 'libmpv-2.dll', '');
+  { Deno: unlocks full-resolution playback (yt-dlp's nsig solver). Hosted as a release asset like ffmpeg. }
+  DownloadPage.Add('{#ToolsBaseUrl}/deno.exe', 'deno.exe', '');
 
   DownloadPage.Show;
   try

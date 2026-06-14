@@ -42,6 +42,7 @@ namespace FreeFlume.Views
             SearchLimitBox.Value = _s.SearchLimit;
             IncludeChannelsToggle.IsOn = _s.SearchIncludeChannels;
             IncludePlaylistsToggle.IsOn = _s.SearchIncludePlaylists;
+            SearchSuggestionsToggle.IsOn = _s.EnableSearchSuggestions;
             ShotFolderText.Text = EffectiveShotFolder();
             SelectByTagOf(ShotFormatCombo, _s.ScreenshotFormat);
             SubFontBox.Text = _s.SubtitleFont;
@@ -144,6 +145,7 @@ namespace FreeFlume.Views
         private void OnEmbedSubsToggled(object sender, RoutedEventArgs e) { if (!_loading) { _s.DownloadEmbedSubs = EmbedSubsToggle.IsOn; _s.Save(); } }
         private void OnIncludeChannelsToggled(object sender, RoutedEventArgs e) { if (!_loading) { _s.SearchIncludeChannels = IncludeChannelsToggle.IsOn; _s.Save(); } }
         private void OnIncludePlaylistsToggled(object sender, RoutedEventArgs e) { if (!_loading) { _s.SearchIncludePlaylists = IncludePlaylistsToggle.IsOn; _s.Save(); } }
+        private void OnSearchSuggestionsToggled(object sender, RoutedEventArgs e) { if (!_loading) { _s.EnableSearchSuggestions = SearchSuggestionsToggle.IsOn; _s.Save(); } }
 
         private void OnSearchLimitChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
         {

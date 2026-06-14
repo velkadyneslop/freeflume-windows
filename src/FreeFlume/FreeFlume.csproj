@@ -22,7 +22,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
         <!-- App version (bump on each release; shown in the title bar + Settings → Backends) -->
-        <Version>1.0.0</Version>
+        <Version>1.0.3</Version>
 
         <!-- App Options -->
         <UseRidGraph>true</UseRidGraph>
@@ -59,6 +59,8 @@
         <None Include="..\..\third_party\win-x64\libmpv-2.dll" Link="libmpv-2.dll" CopyToOutputDirectory="PreserveNewest" />
         <None Include="..\..\third_party\win-x64\yt-dlp.exe" Link="yt-dlp.exe" CopyToOutputDirectory="PreserveNewest" />
         <None Include="..\..\third_party\win-x64\ffmpeg.exe" Link="ffmpeg.exe" CopyToOutputDirectory="PreserveNewest" />
+        <!-- Deno: lets yt-dlp solve YouTube's "nsig" JS challenge for full-resolution formats. -->
+        <None Include="..\..\third_party\win-x64\deno.exe" Link="deno.exe" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>

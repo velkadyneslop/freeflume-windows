@@ -4,7 +4,7 @@
 ; %LOCALAPPDATA%\Programs\FreeFlume with a Start Menu shortcut + uninstaller. No admin / UAC required.
 
 #define MyAppName "FreeFlume"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.3"
 #define MyAppPublisher "velkadyne"
 #define MyAppExeName "FreeFlume.exe"
 #define MyAppUrl "https://github.com/velkadyneslop/freeflume-windows"

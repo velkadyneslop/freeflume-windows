@@ -387,7 +387,10 @@ namespace FreeFlume.Views
             var parts = new List<string>();   // channel shown as a separate link
             if (d.ViewCount >= 0) parts.Add($"{d.ViewCount:N0} views");
             if (d.LikeCount >= 0) parts.Add($"{d.LikeCount:N0} likes");
-            if (d.UploadDate.Length == 8) parts.Add($"{d.UploadDate[..4]}-{d.UploadDate.Substring(4, 2)}-{d.UploadDate.Substring(6, 2)}");
+            if (d.UploadDate.Length == 8 &&
+                DateTime.TryParseExact(d.UploadDate, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None, out var up))
+                parts.Add(up.ToString("d MMM yyyy", System.Globalization.CultureInfo.InvariantCulture));
             return string.Join("   ·   ", parts.FindAll(s => s.Length > 0));
         }
 

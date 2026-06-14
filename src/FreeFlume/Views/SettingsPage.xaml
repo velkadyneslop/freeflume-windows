@@ -182,6 +182,19 @@
                 <TextBlock Text="Show playlists in results" VerticalAlignment="Center" />
                 <ToggleSwitch x:Name="IncludePlaylistsToggle" Grid.Column="1" Toggled="OnIncludePlaylistsToggled" />
             </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Enable search suggestions" VerticalAlignment="Center" />
+                    <TextBlock Text="Sends the text you type to Google to fetch live suggestions."
+                               Style="{ThemeResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                </StackPanel>
+                <ToggleSwitch x:Name="SearchSuggestionsToggle" Grid.Column="1" Toggled="OnSearchSuggestionsToggled" />
+            </Grid>
 
             <!-- Downloads -->
             <TextBlock Text="Downloads" Style="{StaticResource Section}" />

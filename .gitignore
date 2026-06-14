@@ -16,6 +16,8 @@ FreeFlume-Windows-Additions.*
 /third_party/win-x64/ffmpeg.exe
 /third_party/win-x64/libmpv-2.dll
 /third_party/win-x64/yt-dlp.exe
+# deno.exe (~96 MB) ships as a Release asset too (unlocks full-resolution playback).
+/third_party/win-x64/deno.exe
 
 # IDE / tooling
 .vs/

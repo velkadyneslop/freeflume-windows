@@ -134,6 +134,12 @@
             </Button>
             <TextBlock x:Name="ContextTitle" VerticalAlignment="Center" Style="{ThemeResource SubtitleTextBlockStyle}"
                        TextTrimming="CharacterEllipsis" MaxWidth="360" />
+            <!-- Channel tabs: Videos (uploads + live pinned) | Streams (full past+live list). Channel-only. -->
+            <StackPanel x:Name="ChannelTabs" Orientation="Horizontal" Spacing="2"
+                        VerticalAlignment="Center" Visibility="Collapsed">
+                <ToggleButton x:Name="VideosTabBtn" Content="Videos" Click="OnVideosTab" />
+                <ToggleButton x:Name="StreamsTabBtn" Content="Streams" Click="OnStreamsTab" />
+            </StackPanel>
             <TextBox x:Name="ChannelSearchBox" Width="220" PlaceholderText="Search in channel"
                      VerticalAlignment="Center" Visibility="Collapsed" KeyDown="OnChannelSearchKeyDown" />
         </StackPanel>

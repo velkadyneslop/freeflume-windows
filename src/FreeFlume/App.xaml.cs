@@ -54,6 +54,10 @@ namespace FreeFlume
                 ex.Handled = true;
             };
 
+            // Put the bundled tools (yt-dlp/ffmpeg/deno) + a user Deno install on PATH so yt-dlp — invoked
+            // directly and via mpv's ytdl hook — can find them (Deno unlocks full-resolution playback).
+            Services.ToolEnv.Configure();
+
             // Keep yt-dlp current (YouTube breaks it often): seed the writable copy, then auto-check daily.
             Services.YtDlp.EnsureLocalCopy();
             Services.YtDlp.MaybeAutoUpdate();

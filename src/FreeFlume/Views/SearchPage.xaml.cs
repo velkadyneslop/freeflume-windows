@@ -29,11 +29,18 @@ namespace FreeFlume.Views
         private int _savedSearchPage = 1;
         private string _browseUrl = "";
         private string _channelBase = "";   // base channel URL when drilled into a channel (for in-channel search)
+        private bool _channelStreams;       // false = Videos tab, true = Streams tab (channel view only)
+        private bool _inChannelSearch;      // true while showing in-channel search results (tabs hidden)
 
         /// <summary>Set by the player's channel link: browse this channel on next navigation here.</summary>
         public static (string url, string title)? PendingBrowse;
         private bool _ready;
         private bool _searching;
+
+        // Opt-in live YT search suggestions: debounce keystrokes, then fetch + merge with history.
+        private readonly DispatcherTimer _suggestTimer;
+        private string _suggestText = "";
+        private System.Threading.CancellationTokenSource? _suggestCts;
 
         // Remembered pages for this session: returning to any loaded page is instant (no re-fetch).
         // `full` = yt-dlp returned a full raw page, so a next page very likely exists.
@@ -49,6 +56,8 @@ namespace FreeFlume.Views
             NavigationCacheMode = NavigationCacheMode.Enabled;
             ResultsView.ItemsSource = _results;
             ResultsView.ContextRequested += OnResultsContextRequested;
+            _suggestTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(160) };
+            _suggestTimer.Tick += OnSuggestTimerTick;
             _ready = true;
         }
 
@@ -63,12 +72,15 @@ namespace FreeFlume.Views
             _mode = Mode.Browse;
             _browseUrl = url;
             _channelBase = url.TrimEnd('/');
+            _channelStreams = false;
+            _inChannelSearch = false;
             _page = 1;
             ContextTitle.Text = title;
             ContextBar.Visibility = Visibility.Visible;
             FilterBar.Visibility = Visibility.Collapsed;
             ChannelSearchBox.Text = "";
             ChannelSearchBox.Visibility = Visibility.Visible;
+            UpdateChannelTabs();
             _ = DoLoad();
         }
 
@@ -76,11 +88,52 @@ namespace FreeFlume.Views
         private void OnQueryTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput) return;
-            if (!Settings.Shared.RememberSearch) { sender.ItemsSource = null; return; }
             string text = sender.Text.Trim();
+
+            // Live YT suggestions (opt-in): show history instantly, then merge fetched suggestions (debounced).
+            if (Settings.Shared.EnableSearchSuggestions && text.Length > 0)
+            {
+                sender.ItemsSource = HistoryMatches(text);
+                _suggestText = text;
+                _suggestTimer.Stop();
+                _suggestTimer.Start();
+                return;
+            }
+
+            _suggestTimer.Stop();
+            if (!Settings.Shared.RememberSearch) { sender.ItemsSource = null; return; }
+            sender.ItemsSource = HistoryMatches(text);
+        }
+
+        private static List<string> HistoryMatches(string text)
+        {
             var all = Database.Shared.SearchHistory();
-            sender.ItemsSource = text.Length == 0 ? all
+            return text.Length == 0 ? all
                 : all.Where(q => q.Contains(text, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        // Debounced fetch: GET YT suggestions for the typed text, then list them above a few history matches.
+        private async void OnSuggestTimerTick(object? sender, object e)
+        {
+            _suggestTimer.Stop();
+            string text = _suggestText;
+            if (text.Length == 0) return;
+
+            _suggestCts?.Cancel();
+            var cts = _suggestCts = new System.Threading.CancellationTokenSource();
+            List<string> sugg;
+            try { sugg = await SearchSuggest.FetchAsync(text, cts.Token); }
+            catch { return; }
+            if (cts.IsCancellationRequested || sugg.Count == 0) return;
+            if (QueryBox.Text.Trim() != text) return;   // user typed on — this result is stale
+
+            var merged = new List<string>(sugg);
+            foreach (var h in HistoryMatches(text))
+            {
+                if (merged.Count >= sugg.Count + 3) break;
+                if (!merged.Contains(h, StringComparer.OrdinalIgnoreCase)) merged.Add(h);
+            }
+            QueryBox.ItemsSource = merged;
         }
 
         private void OnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
@@ -241,8 +294,9 @@ namespace FreeFlume.Views
                 (r.Kind != ResultKind.Channel || Settings.Shared.SearchIncludeChannels) &&
                 (r.Kind != ResultKind.Playlist || Settings.Shared.SearchIncludePlaylists)).ToList();
 
-            // In a channel view, float currently-live streams to the top (stable; other order preserved).
-            if (_channelBase.Length > 0 && shown.Exists(r => r.IsLive))
+            // On the Videos tab of a channel, float currently-live streams to the top (the Streams tab is
+            // shown as YouTube returns it — live/upcoming already first — so it isn't re-ordered or pinned).
+            if (_channelBase.Length > 0 && !_channelStreams && shown.Exists(r => r.IsLive))
                 shown = shown.OrderByDescending(r => r.IsLive).ToList();
 
             Database.Shared.FillWatchProgress(shown);   // refresh watched bars (may have changed since cached)
@@ -256,7 +310,7 @@ namespace FreeFlume.Views
                 _maxPageByContext[ck] = Math.Max(_maxPageByContext.GetValueOrDefault(ck), _page);
             }
             CheckChannelsLive(shown);
-            if (_channelBase.Length > 0 && _page == 1) ProbeChannelLive(_channelBase);   // surface the live stream
+            if (_channelBase.Length > 0 && !_channelStreams && _page == 1) ProbeChannelLive(_channelBase);   // surface the live stream
             UpdatePager(pageFull);
             if (_results.Count == 0)
             {
@@ -561,7 +615,7 @@ namespace FreeFlume.Views
             if (yyyymmdd.Length == 8 &&
                 DateTime.TryParseExact(yyyymmdd, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture,
                     System.Globalization.DateTimeStyles.None, out var dt))
-                return dt.ToString("MMM d, yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                return dt.ToString("d MMM yyyy", System.Globalization.CultureInfo.InvariantCulture);
             return "";
         }
 
@@ -578,8 +632,11 @@ namespace FreeFlume.Views
             // Channels (not playlists) support search-within. Offer the in-channel box.
             bool isChannel = r.Kind == ResultKind.Channel;
             _channelBase = isChannel ? r.Url.TrimEnd('/') : "";
+            _channelStreams = false;
+            _inChannelSearch = false;
             ChannelSearchBox.Text = "";
             ChannelSearchBox.Visibility = isChannel ? Visibility.Visible : Visibility.Collapsed;
+            UpdateChannelTabs();
 
             _ = DoLoad();
         }
@@ -591,17 +648,50 @@ namespace FreeFlume.Views
             if (q.Length == 0) return;
             _mode = Mode.Browse;
             _browseUrl = _channelBase + "/search?query=" + Uri.EscapeDataString(q);
+            _inChannelSearch = true;   // hide the Videos/Streams tabs while showing search results
             _page = 1;
+            UpdateChannelTabs();
             _ = DoLoad();
+        }
+
+        // ---- channel Videos/Streams tabs ----
+        private void OnVideosTab(object sender, RoutedEventArgs e) => SwitchChannelTab(false);
+        private void OnStreamsTab(object sender, RoutedEventArgs e) => SwitchChannelTab(true);
+
+        // Switch the channel view between uploads (/videos) and the full stream list (/streams). A tab
+        // switch replaces the current view (it isn't a back-stack step) and resets to page 1.
+        private void SwitchChannelTab(bool streams)
+        {
+            if (_channelBase.Length == 0) { UpdateChannelTabs(); return; }
+            if (_channelStreams == streams) { UpdateChannelTabs(); return; }   // clicking the active tab: no-op
+            _channelStreams = streams;
+            _inChannelSearch = false;
+            ChannelSearchBox.Text = "";
+            _browseUrl = streams ? _channelBase + "/streams" : _channelBase;
+            _page = 1;
+            UpdateChannelTabs();
+            _ = DoLoad();
+        }
+
+        // Tabs show only while browsing a channel (hidden on playlists and during an in-channel search).
+        private void UpdateChannelTabs()
+        {
+            bool show = _channelBase.Length > 0 && !_inChannelSearch;
+            ChannelTabs.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+            VideosTabBtn.IsChecked = !_channelStreams;
+            StreamsTabBtn.IsChecked = _channelStreams;
         }
 
         private void OnBackToSearch(object sender, RoutedEventArgs e)
         {
             _mode = Mode.Search;
             _channelBase = "";
+            _channelStreams = false;
+            _inChannelSearch = false;
             ChannelSearchBox.Visibility = Visibility.Collapsed;
             ContextBar.Visibility = Visibility.Collapsed;
             FilterBar.Visibility = Visibility.Visible;
+            UpdateChannelTabs();
             _page = _savedSearchPage;
             _ = DoLoad();
         }

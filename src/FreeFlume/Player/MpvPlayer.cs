@@ -192,9 +192,9 @@ public sealed partial class MpvPlayer : SwapChainPanel, IDisposable
 
     private void InitMpv()
     {
-        // mpv must find our bundled yt-dlp.exe (sits next to the exe).
-        string baseDir = AppContext.BaseDirectory;
-        Environment.SetEnvironmentVariable("PATH", baseDir + ";" + Environment.GetEnvironmentVariable("PATH"));
+        // mpv must find our bundled yt-dlp.exe + deno.exe (sit next to the exe). Done once at startup,
+        // but ensure it here too in case a player is created before App configured the environment.
+        FreeFlume.Services.ToolEnv.Configure();
 
         _mpv = mpv_create();
         if (_mpv == IntPtr.Zero) throw new InvalidOperationException("mpv_create failed");
