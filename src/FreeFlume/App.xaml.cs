@@ -58,6 +58,9 @@ namespace FreeFlume
             // directly and via mpv's ytdl hook — can find them (Deno unlocks full-resolution playback).
             Services.ToolEnv.Configure();
 
+            // Clean up after a self-update (the previous exe renamed aside + any leftover download).
+            Services.AppUpdate.CleanupLeftovers();
+
             // Keep yt-dlp current (YouTube breaks it often): seed the writable copy, then auto-check daily.
             Services.YtDlp.EnsureLocalCopy();
             Services.YtDlp.MaybeAutoUpdate();

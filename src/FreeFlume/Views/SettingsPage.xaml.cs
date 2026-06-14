@@ -273,6 +273,51 @@ namespace FreeFlume.Views
             UpdateYtDlpButton.IsEnabled = true;
         }
 
+        // App self-update (manual). First press checks GitHub; if newer, the button becomes the apply action.
+        private AppUpdate.Info? _pendingUpdate;
+
+        private async void OnAppUpdateClick(object sender, RoutedEventArgs e)
+        {
+            // Second press, when an update is already found: download + apply, then quit so it can swap in.
+            if (_pendingUpdate is { IsNewer: true } found)
+            {
+                AppUpdateButton.IsEnabled = false;
+                var progress = new Progress<double>(p =>
+                    DispatcherQueue.TryEnqueue(() => AppUpdateStatusText.Text = $"Downloading… {p:P0}"));
+                var (ok, msg) = await AppUpdate.ApplyAsync(found, progress);
+                AppUpdateStatusText.Text = msg;
+                if (ok) Application.Current.Exit();
+                else AppUpdateButton.IsEnabled = true;
+                return;
+            }
+
+            // First press: check the latest release.
+            AppUpdateButton.IsEnabled = false;
+            AppUpdateButton.Content = "Checking…";
+            AppUpdateStatusText.Text = "Checking for updates…";
+            try
+            {
+                var info = await AppUpdate.CheckAsync();
+                _pendingUpdate = info;
+                if (info.IsNewer)
+                {
+                    AppUpdateStatusText.Text = $"Update available: {info.Tag} (you have v{App.Version}).";
+                    AppUpdateButton.Content = $"Download & install {info.Tag}";
+                }
+                else
+                {
+                    AppUpdateStatusText.Text = $"You're on the latest version (v{App.Version}).";
+                    AppUpdateButton.Content = "Check for updates";
+                }
+            }
+            catch (Exception ex)
+            {
+                AppUpdateStatusText.Text = "Couldn't check for updates: " + ex.Message;
+                AppUpdateButton.Content = "Check for updates";
+            }
+            AppUpdateButton.IsEnabled = true;
+        }
+
         private async void DetectBackends()
         {
             string ytdlp = await RunVersion(YtDlp.ExePath, "--version");

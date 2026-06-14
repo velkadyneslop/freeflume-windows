@@ -426,6 +426,17 @@
                 <Button x:Name="UpdateYtDlpButton" Grid.Column="1" Content="Update yt-dlp now"
                         Click="OnUpdateYtDlpClick" />
             </Grid>
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="AppUpdateStatusText" VerticalAlignment="Center" TextWrapping="Wrap"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Style="{ThemeResource CaptionTextBlockStyle}" Text="Check whether a newer FreeFlume is available." />
+                <Button x:Name="AppUpdateButton" Grid.Column="1" Content="Check for updates"
+                        Click="OnAppUpdateClick" />
+            </Grid>
         </StackPanel>
     </ScrollViewer>
 </Page>

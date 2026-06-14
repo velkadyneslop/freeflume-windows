@@ -15,6 +15,8 @@ to full feature parity with the Linux version (and aligns the version number to 
   makes no network requests.
 - **Unified date format** — upload dates now read the same everywhere (lists, the detail pane, and the
   in-player info panel).
+- **App self-update** — **Settings → Backends → Check for updates** finds newer releases and installs them
+  in place (the portable build swaps itself and restarts; the installed build runs the new setup).
 
 ## Downloads
 - **`FreeFlume.exe`** — portable all-in-one, nothing to install.
