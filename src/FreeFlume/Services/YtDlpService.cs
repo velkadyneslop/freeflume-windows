@@ -41,11 +41,27 @@ public sealed class YtDlpService
     /// <summary>Browse a channel or playlist (drill-in). Channel URLs get a /videos tab.
     /// Returns the page items, the playlist's total item count (0 if open-ended), and the raw
     /// entry count yt-dlp returned (so callers can tell a full page from the last page).</summary>
-    public Task<(List<SearchResult> items, int total, int rawCount)> BrowseAsync(string url, int page, int pageSize, CancellationToken ct = default)
+    public async Task<(List<SearchResult> items, int total, int rawCount)> BrowseAsync(string url, int page, int pageSize, CancellationToken ct = default)
     {
+        // Playlists: yt-dlp's anonymous extractor stops paginating past ~200 items, so go straight to
+        // YouTube's InnerTube browse API with a crafted continuation token (docs/playlist-pagination-fix).
+        string? plId = InnerTube.PlaylistId(url);
+        if (plId is not null)
+        {
+            var p = await InnerTube.FetchPlaylistPageAsync(plId, page, pageSize, ct);
+            // If InnerTube returns items, trust it. If it comes back empty for an early page (a format
+            // break, or a transient error), fall back to yt-dlp so playlists aren't dead entirely —
+            // yt-dlp still serves the first ~200 items fine.
+            if (p.items.Count > 0 || page * pageSize > 200) return p;
+        }
+
         int end = page * pageSize;
         int start = (page - 1) * pageSize + 1;
-        return RunAndParse(FlatArgs(start, end, NormalizeBrowseUrl(url)), throwOnEmpty: false, ct);
+        var (items, _, raw) = await RunAndParse(FlatArgs(start, end, NormalizeBrowseUrl(url)), throwOnEmpty: false, ct);
+        // A channel's /videos or /streams tab doesn't expose a reliable item count; never derive a finite
+        // pager from one — a small streams count would cap the pager and hide later pages. Channels use
+        // the open-ended ("of N+") pager instead (docs/channel-pagination-fix, Linux parity).
+        return (items, 0, raw);
     }
 
     private static string[] FlatArgs(int start, int end, string target) => new[]

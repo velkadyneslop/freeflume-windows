@@ -22,7 +22,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
         <!-- App version (bump on each release; shown in the title bar + Settings → Backends) -->
-        <Version>1.0.3</Version>
+        <Version>1.0.4</Version>
 
         <!-- App Options -->
         <UseRidGraph>true</UseRidGraph>

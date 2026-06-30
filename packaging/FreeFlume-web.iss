@@ -9,7 +9,7 @@
 ;     tagged "v{version}":  ffmpeg.exe, libmpv-2.dll  (yt-dlp + .NET come from official sources).
 
 #define MyAppName "FreeFlume"
-#define MyAppVersion "1.0.3"
+#define MyAppVersion "1.0.4"
 #define MyAppPublisher "velkadyne"
 #define MyAppExeName "FreeFlume.exe"
 #define MyRepoUrl "https://github.com/velkadyneslop/freeflume-windows"
