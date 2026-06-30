@@ -28,6 +28,8 @@ FreeFlume-Windows-Additions.*
 push.ps1
 release.ps1
 publish.ps1
+# Release notes are fed to `gh release` at publish time, not part of the source
+RELEASE-NOTES-*.md
 
 # Claude Code local session + memory
 .claude/
